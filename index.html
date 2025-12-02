@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr/dist/l10n/es.js"></script>
+  <meta charset="UTF-8" />
+  <title>Reservá tu cancha · Complejo Futbol 7</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #05070b;
+      --bg-alt: #0a0d14;
+      --card: #10141f;
+      --accent: #e53935;
+      --accent-soft: rgba(229, 57, 53, 0.18);
+      --text: #f5f5f5;
+      --text-muted: #a5a8b7;
+      --border: #25293a;
+      --radius-lg: 18px;
+      --radius-md: 12px;
+      --shadow-soft: 0 12px 26px rgba(0, 0, 0, 0.45);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    body {
+      background: radial-gradient(circle at top, #1d2438 0, #05070b 55%, #020308 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1180px;
+      padding: 16px 14px 32px;
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 16px;
+      background: radial-gradient(circle at 20% 0, #ffffff 0, #c62828 30%, #000000 90%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 18px;
+      color: #fff;
+      box-shadow: 0 0 16px rgba(229, 57, 53, 0.7);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-name {
+      font-size: 16px;
+      font-weight: 600;
+    }
+
+    .brand-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .header-pill {
+      font-size: 11px;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      background: rgba(6, 8, 14, 0.96);
+      white-space: nowrap;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(16, 20, 32, 0.98), rgba(13, 17, 27, 0.98));
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      padding: 16px 14px 14px;
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1.2fr);
+      gap: 14px;
+    }
+
+    @media (max-width: 820px) {
+      .hero {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .hero-main-title {
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .hero-highlight {
+      color: var(--accent);
+    }
+
+    .hero-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 10px;
+    }
+
+    .hero-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-bottom: 10px;
+    }
+
+    .badge {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(4, 6, 12, 0.96);
+      color: var(--text-muted);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: #66bb6a;
+      box-shadow: 0 0 6px rgba(102, 187, 106, 0.9);
+    }
+
+    .hero-note {
+      font-size: 11px;
+      padding-bottom: 20px;
+      color: var(--text-muted);
+    }
+
+    .pitches {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 620px) {
+      .pitches {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    /* Flatpickr: día con reservas */
+    .flatpickr-day.has-booking {
+      position: relative;
+    }
+
+    .flatpickr-day.has-booking::after {
+      content: '';
+      width: 4px;
+      height: 4px;
+      border-radius: 50%;
+      background: var(--accent);
+      position: absolute;
+      bottom: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    /* Flatpickr: día deshabilitado por horario del complejo */
+    .flatpickr-day.flatpickr-disabled-day {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .pitch-card {
+      background: radial-gradient(circle at top, rgba(229, 57, 53, 0.2), rgba(9, 12, 20, 0.98));
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      transition: border 0.12s ease, box-shadow 0.12s ease, transform 0.08s ease;
+    }
+
+    .pitch-card:hover {
+      border-color: rgba(229, 57, 53, 0.7);
+      box-shadow: 0 0 14px rgba(229, 57, 53, 0.4);
+      transform: translateY(-1px);
+    }
+
+    .pitch-card.selected {
+      border-color: rgba(229, 57, 53, 0.9);
+      box-shadow: 0 0 18px rgba(229, 57, 53, 0.7);
+    }
+
+    .pitch-img {
+      position: relative;
+      padding-top: 60%;
+      overflow: hidden;
+    }
+
+    .pitch-img img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: saturate(1.1) contrast(1.1);
+      transform: scale(1.02);
+    }
+
+    .pitch-body {
+      padding: 8px 9px 9px;
+      font-size: 12px;
+    }
+
+    .pitch-name {
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .pitch-desc {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+    }
+
+    .pitch-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: var(--text-muted);
+    }
+
+    .pitch-price {
+      font-weight: 600;
+      color: #ffccbc;
+    }
+
+    .pitch-capacity {
+      font-size: 10px;
+      opacity: 0.8;
+    }
+
+    .card-form {
+      background: linear-gradient(135deg, rgba(13, 17, 27, 0.98), rgba(10, 13, 21, 0.98));
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow-soft);
+      padding: 14px 12px;
+    }
+
+    .card-form-header {
+      margin-bottom: 10px;
+    }
+
+    .card-form-title {
+      font-size: 17px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .card-form-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .field-group {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 12px;
+    }
+
+    .field-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      font-size: 12px;
+    }
+
+    .field-label span {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .field-label small {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(5, 7, 13, 0.98);
+      color: var(--text);
+      font-size: 12px;
+      outline: none;
+      transition: border 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    }
+
+    .slot-free {
+      opacity: 1;
+      cursor: pointer;
+    }
+
+    .slot-taken {
+      opacity: 0.4;
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+
+    .slot-closed {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+
+    .textarea {
+      border-radius: 10px;
+      resize: vertical;
+      min-height: 54px;
+      max-height: 140px;
+    }
+
+    .input::placeholder,
+    .textarea::placeholder {
+      color: var(--text-muted);
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: rgba(229, 57, 53, 0.8);
+      box-shadow: 0 0 10px rgba(229, 57, 53, 0.4);
+      background: rgba(5, 7, 13, 0.98);
+    }
+
+    .row-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    @media (max-width: 520px) {
+      .row-2 {
+        grid-template-columns: minmax(0, 1fr);
+      }
+    }
+
+    .radio-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 11px;
+    }
+
+    .radio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(5, 7, 13, 0.98);
+      cursor: pointer;
+      color: var(--text-muted);
+      transition: border 0.12s ease, background 0.12s ease, color 0.12s ease;
+    }
+
+    .radio-pill input {
+      accent-color: var(--accent);
+    }
+
+    .radio-pill.active {
+      border-color: rgba(229, 57, 53, 0.8);
+      background: var(--accent-soft);
+      color: #ffe0d7;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), #ff7043);
+      color: #fff;
+      box-shadow: 0 7px 18px rgba(229, 57, 53, 0.7);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      margin-top: 4px;
+      transition: transform 0.08s ease, box-shadow 0.12s ease, opacity 0.12s ease;
+    }
+
+    .btn-primary:active {
+      transform: translateY(1px) scale(0.98);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+    }
+
+    .btn-primary[disabled] {
+      opacity: 0.65;
+      cursor: default;
+      box-shadow: none;
+    }
+
+    .helper-text {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    #booking-message,
+    #cancel-message {
+      margin-top: 8px;
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      display: none;
+    }
+
+    .msg-ok {
+      background: rgba(76, 175, 80, 0.12);
+      color: #a5d6a7;
+      border: 1px solid rgba(76, 175, 80, 0.7);
+    }
+
+    .msg-error {
+      background: rgba(244, 67, 54, 0.12);
+      color: #ef9a9a;
+      border: 1px solid rgba(244, 67, 54, 0.7);
+    }
+
+    .footer-mini {
+      margin-top: 14px;
+      font-size: 10px;
+      color: var(--text-muted);
+      text-align: center;
+      opacity: 0.75;
+    }
+
+    .divider-inline {
+      margin: 14px 0 10px;
+      border: 0;
+      border-top: 1px dashed rgba(255,255,255,0.15);
+    }
+
+    .btn-secondary {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(5,7,13,0.98);
+      color: var(--text-muted);
+      font-size: 13px;
+      cursor: pointer;
+      margin-top: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+  <header class="header">
+    <div class="brand">
+      <div class="brand-logo">C7</div>
+      <div class="brand-text">
+        <div class="brand-name">Complejo Fútbol 7</div>
+        <div class="brand-sub">Reservá tu turno online en segundos</div>
+      </div>
+    </div>
+    <div class="header-pill">Sistema de turnos · Novara Works</div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1 class="hero-main-title">
+        Reservá tu <span class="hero-highlight">cancha</span><br/>para tu próximo partido
+      </h1>
+      <p class="hero-desc">
+        Elegí la cancha, el día y el horario. Completás tus datos y tu reserva queda registrada en el sistema.
+        El complejo se comunicará con vos si hay alguna novedad.
+      </p>
+
+      <div class="hero-badges">
+        <div class="badge">
+          <span class="badge-dot"></span>
+          Turnos confirmados en tiempo real
+        </div>
+        <div class="badge">3 canchas · Fútbol 7</div>
+        <div class="badge">Pagás en el lugar o señás</div>
+      </div>
+
+      <p class="hero-note">
+        Primero elegí la cancha acá abajo; el formulario se completa con esa selección para registrar tu turno.
+      </p>
+
+      <div class="pitches" id="pitches">
+        <article class="pitch-card selected" data-pitch-id="1" data-pitch-name="Cancha 1">
+          <div class="pitch-img">
+            <img src="src/img/cancha1.webp" alt="Cancha 1 Techada">
+          </div>
+          <div class="pitch-body">
+            <div class="pitch-name">Cancha 1</div>
+            <p class="pitch-desc">Sintético, iluminación LED, Contador de tiempo + Goles.</p>
+            <div class="pitch-meta">
+              <span class="pitch-price">Desde $4.000 x jugador</span>
+              <span class="pitch-capacity">Fútbol 7 · 14 jugadores</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="pitch-card" data-pitch-id="2" data-pitch-name="Cancha 2">
+          <div class="pitch-img">
+            <img src="src/img/cancha2.webp" alt="Cancha 2 Abierta">
+          </div>
+          <div class="pitch-body">
+            <div class="pitch-name">Cancha 2</div>
+            <p class="pitch-desc">Sintético, iluminación LED, Contador de tiempo + Goles.</p>
+            <div class="pitch-meta">
+              <span class="pitch-price">Desde $4.000 x jugador</span>
+              <span class="pitch-capacity">Fútbol 7 · 14 jugadores</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="pitch-card" data-pitch-id="3" data-pitch-name="Cancha 3">
+          <div class="pitch-img">
+            <img src="src/img/cancha3.webp" alt="Cancha 3 Mixta">
+          </div>
+          <div class="pitch-body">
+            <div class="pitch-name">Cancha 3</div>
+            <p class="pitch-desc">Sintético, iluminación LED, Contador de tiempo + Goles.</p>
+            <div class="pitch-meta">
+              <span class="pitch-price">Desde $4.000 x jugador</span>
+              <span class="pitch-capacity">Fútbol 7 · 14 jugadores</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+
+    <div class="card-form">
+      <div class="card-form-header">
+        <h2 class="card-form-title">Reservar turno</h2>
+        <p class="card-form-sub">
+          Completá los datos para solicitar tu reserva. Te recomendamos usar tu celular para recibir cualquier contacto.
+        </p>
+      </div>
+
+      <form id="booking-form" autocomplete="on">
+        <div class="row-2">
+          <div class="field-group">
+            <label class="field-label" for="pitch">
+              Cancha seleccionada
+              <small id="pitch-selected-label">Cancha 1</small>
+            </label>
+            <select id="pitch" name="pitch_id" class="select" required>
+              <option value="">Elegí una cancha</option>
+              <option value="1" selected>Cancha 1</option>
+              <option value="2">Cancha 2</option>
+              <option value="3">Cancha 3</option>
+            </select>
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="date">
+              Día de juego <span>Obligatorio</span>
+            </label>
+            <!-- type text para que Flatpickr tome control sin el date nativo -->
+            <input type="text" id="date" name="date" class="input" placeholder="Elegí una fecha" required />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="time">
+            Horario <span>Obligatorio</span>
+          </label>
+          <select id="time" name="time_start" class="select" required>
+            <option value="">Elegí un horario</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+            <option value="17:00">17:00</option>
+            <option value="18:00">18:00</option>
+            <option value="19:00">19:00</option>
+            <option value="20:00">20:00</option>
+            <option value="21:00">21:00</option>
+            <option value="22:00">22:00</option>
+          </select>
+        </div>
+
+        <div class="row-2">
+          <div class="field-group">
+            <label class="field-label" for="client_name">
+              Nombre y apellido <span>Obligatorio</span>
+            </label>
+            <input
+              type="text"
+              id="client_name"
+              name="client_name"
+              class="input"
+              placeholder="Ej: Juan Pérez"
+              required
+            />
+          </div>
+
+          <div class="field-group">
+            <label class="field-label" for="client_phone">
+              Teléfono <span>Obligatorio</span>
+            </label>
+            <input
+              type="tel"
+              id="client_phone"
+              name="client_phone"
+              class="input"
+              placeholder="Ej: 3462 380194"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="notes">
+            Detalles (opcional)
+          </label>
+          <textarea
+            id="notes"
+            name="notes"
+            class="textarea"
+            placeholder="Cualquier información extra que quieras que el complejo tenga en cuenta..."
+          ></textarea>
+        </div>
+
+        <div class="field-group">
+          <div class="field-label">
+            Tipo de reserva
+            <span>Obligatorio</span>
+          </div>
+          <div class="radio-row" id="reservation-type-row">
+            <label class="radio-pill active">
+              <input
+                type="radio"
+                name="reservation_type_radio"
+                value="pago_local"
+                checked
+              />
+              Pagaré localmente
+            </label>
+            <label class="radio-pill">
+              <input
+                type="radio"
+                name="reservation_type_radio"
+                value="senia"
+              />
+              Señar turno
+            </label>
+          </div>
+          <input type="hidden" id="reservation_type" name="reservation_type" value="pago_local" />
+          <p class="helper-text">
+            El complejo podrá contactarte para coordinar señas o confirmar tu llegada según su política interna.
+          </p>
+        </div>
+
+        <button type="submit" class="btn-primary" id="submit-btn">
+          Reservar turno
+        </button>
+
+        <div id="booking-message"></div>
+      </form>
+
+      <hr class="divider-inline" />
+
+      <h3 class="card-form-title" style="font-size:15px;">Cancelar turno</h3>
+      <p class="card-form-sub">
+        Si ya tenés un turno y no vas a poder asistir, podés cancelarlo acá con al menos 12 horas de anticipación.
+      </p>
+
+      <form id="cancel-form">
+        <div class="row-2">
+          <div class="field-group">
+            <label class="field-label" for="cancel_phone">
+              Teléfono usado en la reserva
+            </label>
+            <input
+              type="tel"
+              id="cancel_phone"
+              class="input"
+              placeholder="Ej: 3462 380194"
+              required
+            />
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="cancel_name">
+              Nombre (opcional)
+            </label>
+            <input
+              type="text"
+              id="cancel_name"
+              class="input"
+              placeholder="Tu nombre"
+            />
+          </div>
+        </div>
+
+        <div class="row-2">
+          <div class="field-group">
+            <label class="field-label" for="cancel_pitch">
+              Cancha
+            </label>
+            <select id="cancel_pitch" class="select" required>
+              <option value="">Elegí una cancha</option>
+              <option value="1">Cancha 1</option>
+              <option value="2">Cancha 2</option>
+              <option value="3">Cancha 3</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="cancel_date">
+              Día del turno
+            </label>
+            <input type="date" id="cancel_date" class="input" required />
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-label" for="cancel_time">
+            Horario del turno
+          </label>
+          <select id="cancel_time" class="select" required>
+            <option value="">Elegí el horario reservado</option>
+            <option value="14:00">14:00</option>
+            <option value="15:00">15:00</option>
+            <option value="16:00">16:00</option>
+            <option value="17:00">17:00</option>
+            <option value="18:00">18:00</option>
+            <option value="19:00">19:00</option>
+            <option value="20:00">20:00</option>
+            <option value="21:00">21:00</option>
+            <option value="22:00">22:00</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn-secondary" id="cancel-btn">
+          Cancelar mi turno
+        </button>
+
+        <div id="cancel-message"></div>
+      </form>
+    </div>
+  </section>
+
+  <div class="footer-mini">
+    Este formulario registra tu reserva dentro del sistema interno del complejo. La confirmación final puede depender
+    de la disponibilidad y políticas del lugar.
+  </div>
+</div>
+
+<script>
+  // 👇 Ajustá solo esto si cambiás de carpeta
+  const API_BASE = '/turnos/api';
+
+  const form = document.getElementById('booking-form');
+  const messageEl = document.getElementById('booking-message');
+  const submitBtn = document.getElementById('submit-btn');
+
+  const cancelForm = document.getElementById('cancel-form');
+  const cancelMessageEl = document.getElementById('cancel-message');
+  const cancelBtn = document.getElementById('cancel-btn');
+
+  const pitchesEl = document.getElementById('pitches');
+  const pitchSelect = document.getElementById('pitch');
+  const pitchLabel = document.getElementById('pitch-selected-label');
+
+  const reservationTypeHidden = document.getElementById('reservation_type');
+  const reservationTypeRow = document.getElementById('reservation-type-row');
+
+  const dateInput = document.getElementById('date');
+  const cancelDateInput = document.getElementById('cancel_date');
+  const timeSelect = document.getElementById('time');
+
+  let scheduleConfig = null; // para bloquear días deshabilitados
+  let bookingCalendar = null;           // instancia de flatpickr
+  const bookedDaysCache = {};           // cache: "pitch-year-month" -> Set de 'YYYY-MM-DD'
+
+  // Fecha mínima = hoy (para cancelación, el de reserva lo maneja Flatpickr)
+  (function setMinDateToday() {
+    const today = new Date();
+    const iso = today.toISOString().slice(0, 10);
+    if (cancelDateInput) cancelDateInput.min = iso;
+  })();
+
+  function showMessage(el, text, type = 'ok') {
+    if (!el) return;
+    if (!text) {
+      el.style.display = 'none';
+      el.textContent = '';
+      el.className = '';
+      return;
+    }
+    el.style.display = 'block';
+    el.textContent = text;
+    el.className = '';
+    if (type === 'ok') {
+      el.classList.add('msg-ok');
+    } else {
+      el.classList.add('msg-error');
+    }
+  }
+
+  function monthKey(year, month, pitchId) {
+    return `${pitchId}-${year}-${month}`;
+  }
+
+  function isDayBooked(isoDate) {
+    const d = new Date(isoDate + 'T00:00:00');
+    if (isNaN(d.getTime())) return false;
+    const year = d.getFullYear();
+    const month = d.getMonth() + 1;
+    const pitchId = parseInt(pitchSelect.value || '0', 10);
+    const key = monthKey(year, month, pitchId);
+    const set = bookedDaysCache[key];
+    return set ? set.has(isoDate) : false;
+  }
+
+  async function fetchMonthBookings(year, month) {
+    const pitchId = parseInt(pitchSelect.value || '0', 10);
+    if (!pitchId) return;
+    const key = monthKey(year, month, pitchId);
+
+    try {
+      const res = await fetch(`${API_BASE}/public_month_availability.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ year, month, pitch_id: pitchId })
+      });
+
+      const data = await res.json();
+      if (!data.success) {
+        console.error(data.error || 'Error al cargar días con reservas');
+        return;
+      }
+
+      bookedDaysCache[key] = new Set(data.booked_days || []);
+
+      if (bookingCalendar) {
+        bookingCalendar.redraw();
+      }
+    } catch (err) {
+      console.error('Error en fetchMonthBookings:', err);
+    }
+  }
+
+  // Cargar schedule público para bloquear días deshabilitados
+  async function loadScheduleConfig() {
+    try {
+      const res = await fetch(`${API_BASE}/settings.php?action=load`);
+      const data = await res.json();
+      if (data.success && Array.isArray(data.schedule)) {
+        scheduleConfig = data.schedule;
+        if (bookingCalendar) {
+          bookingCalendar.redraw();
+        }
+      }
+    } catch (e) {
+      // Si falla, simplemente no bloqueamos en el front,
+      // pero el backend igual valida.
+      console.error('Error cargando schedule:', e);
+    }
+  }
+  loadScheduleConfig();
+
+  function isWeekdayEnabled(dateStr) {
+    if (!scheduleConfig || !dateStr) return true;
+    const d = new Date(dateStr + 'T00:00:00');
+    if (isNaN(d.getTime())) return true;
+    let weekday = d.getDay(); // 0=Dom..6=Sab
+    weekday = weekday === 0 ? 7 : weekday; // 1-7
+    const row = scheduleConfig.find(r => Number(r.weekday) === weekday);
+    if (!row) return true;
+    return Number(row.enabled) === 1;
+  }
+
+  // Inicializar Flatpickr en el campo de fecha de reserva
+  if (dateInput && window.flatpickr) {
+    flatpickr.localize(flatpickr.l10ns.es);
+
+    bookingCalendar = flatpickr("#date", {
+      dateFormat: "Y-m-d",
+      minDate: "today",
+      onChange: function(selectedDates, dateStr) {
+        if (dateStr) {
+          // Validar día habilitado según schedule
+          if (!isWeekdayEnabled(dateStr)) {
+            showMessage(messageEl, 'Ese día el complejo no toma turnos. Elegí otro día.', 'error');
+            bookingCalendar.clear();
+            if (timeSelect) timeSelect.value = '';
+            return;
+          }
+          showMessage(messageEl, '');
+          loadBookingAvailability();
+        }
+      },
+      onMonthChange: function(selectedDates, dateStr, instance) {
+        const year = instance.currentYear;
+        const month = instance.currentMonth + 1;
+        fetchMonthBookings(year, month);
+      },
+      onReady: function(selectedDates, dateStr, instance) {
+        const year = instance.currentYear;
+        const month = instance.currentMonth + 1;
+        fetchMonthBookings(year, month);
+      },
+      onDayCreate: function(dObj, dStr, fp, dayElem) {
+        const dateObj = dayElem.dateObj;
+        const iso = dateObj.toISOString().slice(0, 10);
+
+        if (isDayBooked(iso)) {
+          dayElem.classList.add('has-booking');
+        }
+
+        if (!isWeekdayEnabled(iso)) {
+          dayElem.classList.add('flatpickr-disabled-day', 'flatpickr-disabled');
+          dayElem.setAttribute('aria-disabled', 'true');
+          dayElem.tabIndex = -1;
+        }
+      }
+    });
+  }
+
+  // 🔥 Cargar disponibilidad y deshabilitar horarios ocupados
+  async function loadBookingAvailability() {
+    if (!dateInput || !pitchSelect || !timeSelect) return;
+
+    const date = dateInput.value;
+    const pitchId = parseInt(pitchSelect.value, 10);
+
+    if (!date || !pitchId) return;
+
+    try {
+      const res = await fetch(`${API_BASE}/public_availability.php`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ date, pitch_id: pitchId })
+      });
+
+      const data = await res.json();
+      console.log('Disponibilidad:', data);
+
+      // Resetear opciones
+      Array.from(timeSelect.options).forEach(opt => {
+        if (!opt.value) return; // "Elegí un horario"
+        opt.disabled = false;
+        opt.textContent = opt.textContent
+          .replace(' (ocupado)', '')
+          .replace(' (no disponible)', '');
+      });
+
+      if (!data.success) {
+        console.error(data.error || 'Error al cargar disponibilidad');
+        return;
+      }
+
+      if (!data.enabled) {
+        // Día cerrado: marcar todos los horarios como no disponibles
+        Array.from(timeSelect.options).forEach(opt => {
+          if (!opt.value) return;
+          opt.disabled = true;
+          opt.textContent = opt.textContent + ' (no disponible)';
+        });
+        timeSelect.value = '';
+        return;
+      }
+
+      const taken = data.taken_times || [];
+
+      Array.from(timeSelect.options).forEach(opt => {
+        if (!opt.value) return;
+        const hora = opt.value; // "14:00"
+        const isTaken = taken.includes(hora);
+        opt.disabled = isTaken;
+        opt.textContent = opt.textContent.replace(' (ocupado)', '');
+        if (isTaken) {
+          opt.textContent += ' (ocupado)';
+        }
+      });
+
+      // Si el horario seleccionado se acaba de marcar ocupado, lo limpiamos
+      if (timeSelect.value && taken.includes(timeSelect.value)) {
+        timeSelect.value = '';
+      }
+    } catch (err) {
+      console.error('Error en fetch disponibilidad:', err);
+    }
+  }
+
+  if (cancelDateInput) {
+    cancelDateInput.addEventListener('change', () => {
+      const val = cancelDateInput.value;
+      if (val && !isWeekdayEnabled(val)) {
+        showMessage(cancelMessageEl, 'Ese día no se toman turnos, revisá la fecha ingresada.', 'error');
+        cancelDateInput.value = '';
+      }
+    });
+  }
+
+  // Sincronizar cards de cancha con select
+  if (pitchesEl && pitchSelect && pitchLabel) {
+    pitchesEl.addEventListener('click', (e) => {
+      const card = e.target.closest('.pitch-card');
+      if (!card) return;
+      const pitchId = card.dataset.pitchId;
+      const pitchName = card.dataset.pitchName || 'Cancha';
+      document.querySelectorAll('.pitch-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      pitchSelect.value = pitchId;
+      pitchLabel.textContent = pitchName;
+      loadBookingAvailability();
+
+      if (bookingCalendar) {
+        const year  = bookingCalendar.currentYear;
+        const month = bookingCalendar.currentMonth + 1;
+        fetchMonthBookings(year, month);
+      }
+    });
+
+    pitchSelect.addEventListener('change', () => {
+      const value = pitchSelect.value;
+      const card = pitchesEl.querySelector(`.pitch-card[data-pitch-id="${value}"]`);
+      document.querySelectorAll('.pitch-card').forEach(c => c.classList.remove('selected'));
+      if (card) {
+        card.classList.add('selected');
+        pitchLabel.textContent = card.dataset.pitchName || 'Cancha';
+      } else {
+        pitchLabel.textContent = 'Elegí una cancha';
+      }
+      loadBookingAvailability();
+
+      if (bookingCalendar) {
+        const year  = bookingCalendar.currentYear;
+        const month = bookingCalendar.currentMonth + 1;
+        fetchMonthBookings(year, month);
+      }
+    });
+  }
+
+  // Tipo de reserva (pills)
+  if (reservationTypeRow && reservationTypeHidden) {
+    reservationTypeRow.addEventListener('change', (e) => {
+      const input = e.target;
+      if (!input || input.name !== 'reservation_type_radio') return;
+      const value = input.value || 'pago_local';
+      reservationTypeHidden.value = value;
+      reservationTypeRow.querySelectorAll('.radio-pill').forEach(label => {
+        label.classList.remove('active');
+      });
+      const label = input.closest('.radio-pill');
+      if (label) label.classList.add('active');
+    });
+  }
+
+  // Envío de reserva
+  if (form) {
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const pitchId = pitchSelect.value;
+      const date = dateInput.value;
+      const timeStart = document.getElementById('time').value;
+      const clientName = document.getElementById('client_name').value.trim();
+      const clientPhone = document.getElementById('client_phone').value.trim();
+      const notes = (document.getElementById('notes')?.value || '').trim();
+      const reservationType = reservationTypeHidden.value || 'pago_local';
+
+      if (!pitchId || !date || !timeStart || !clientName || !clientPhone) {
+        showMessage(messageEl, 'Por favor completá todos los campos obligatorios.', 'error');
+        return;
+      }
+
+      showMessage(messageEl, 'Enviando tu reserva...', 'ok');
+      if (submitBtn) submitBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/public_booking.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'create',
+            pitch_id: parseInt(pitchId, 10),
+            client_name: clientName,
+            client_phone: clientPhone,
+            date: date,
+            time_start: timeStart,
+            duration_minutes: 60,
+            reservation_type: reservationType,
+            notes: notes
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          showMessage(messageEl, data.error || 'Ocurrió un error al crear el turno.', 'error');
+        } else {
+          showMessage(messageEl, '¡Tu turno fue registrado! El complejo se pondrá en contacto si necesita confirmar algo.', 'ok');
+          form.reset();
+          // reset de cancha & cards
+          pitchSelect.value = '1';
+          const firstCard = document.querySelector('.pitch-card[data-pitch-id="1"]');
+          document.querySelectorAll('.pitch-card').forEach(c => c.classList.remove('selected'));
+          if (firstCard) firstCard.classList.add('selected');
+          pitchLabel.textContent = 'Cancha 1';
+          // reset de tipo de reserva
+          reservationTypeHidden.value = 'pago_local';
+          reservationTypeRow.querySelectorAll('.radio-pill').forEach((label, idx) => {
+            label.classList.toggle('active', idx === 0);
+            const input = label.querySelector('input[type="radio"]');
+            if (input) input.checked = idx === 0;
+          });
+          // reset de horarios
+          if (timeSelect) timeSelect.value = '';
+          // reset de fecha en Flatpickr
+          if (bookingCalendar) bookingCalendar.clear();
+        }
+      } catch (err) {
+        console.error('Error al enviar reserva:', err);
+        showMessage(messageEl, 'No se pudo contactar con el servidor. Intentá de nuevo en unos minutos.', 'error');
+      } finally {
+        if (submitBtn) submitBtn.disabled = false;
+      }
+    });
+  }
+
+  // Envío cancelación
+  if (cancelForm) {
+    cancelForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const phone = document.getElementById('cancel_phone').value.trim();
+      const name  = document.getElementById('cancel_name').value.trim();
+      const pitch = document.getElementById('cancel_pitch').value;
+      const date  = cancelDateInput.value;
+      const time  = document.getElementById('cancel_time').value;
+
+      if (!phone || !pitch || !date || !time) {
+        showMessage(cancelMessageEl, 'Completá todos los campos obligatorios para cancelar tu turno.', 'error');
+        return;
+      }
+
+      showMessage(cancelMessageEl, 'Procesando cancelación...', 'ok');
+      if (cancelBtn) cancelBtn.disabled = true;
+
+      try {
+        const res = await fetch(`${API_BASE}/public_booking.php`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            action: 'cancel',
+            client_phone: phone,
+            client_name: name,
+            pitch_id: parseInt(pitch, 10),
+            date: date,
+            time_start: time
+          })
+        });
+
+        const data = await res.json();
+
+        if (!data.success) {
+          showMessage(cancelMessageEl, data.error || 'No se pudo cancelar el turno.', 'error');
+        } else {
+          showMessage(cancelMessageEl, data.message || 'Tu turno fue cancelado correctamente.', 'ok');
+          cancelForm.reset();
+        }
+
+      } catch (err) {
+        console.error('Error al cancelar:', err);
+        showMessage(cancelMessageEl, 'No se pudo contactar con el servidor. Intentá de nuevo.', 'error');
+      } finally {
+        if (cancelBtn) cancelBtn.disabled = false;
+      }
+    });
+  }
+
+  // Al cargar la página, si ya hay fecha/cancha seleccionadas, cargamos disponibilidad
+  if (dateInput && pitchSelect && timeSelect && dateInput.value && pitchSelect.value) {
+    loadBookingAvailability();
+  }
+</script>
+</body>
+</html>
